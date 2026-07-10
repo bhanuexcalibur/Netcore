@@ -192,16 +192,15 @@ section.part{padding:84px 0;border-bottom:1px solid var(--bdr);}
 .thesis strong{color:var(--t1);font-weight:600;}
 
 /* ===== OTHER WORK ===== */
-.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.wgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
 .wcard{display:block;background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:22px;text-decoration:none;transition:all 0.2s ease;position:relative;}
 .wcard:hover{border-color:var(--bmd);background:var(--bg4);transform:translateY(-2px);}
-.wcard.full{grid-column:span 3;}
+.wcard.full{grid-column:span 2;}
 .wcard-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--amber-t);letter-spacing:0.03em;text-transform:uppercase;display:block;margin-bottom:12px;}
 .wcard h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;color:var(--t1);margin-bottom:8px;}
 .wcard p{font-size:13.5px;color:var(--t2);line-height:1.62;margin-bottom:14px;}
 .wcard-arr{font-size:14px;color:var(--t3);transition:transform 0.2s,color 0.2s;}
 .wcard:hover .wcard-arr{transform:translateX(4px);color:var(--signal-t);}
-@media(max-width:860px){.wgrid{grid-template-columns:1fr 1fr;}.wcard.full{grid-column:span 2;}}
 @media(max-width:600px){.wgrid{grid-template-columns:1fr;}.wcard.full{grid-column:span 1;}}
 
 /* ===== SIGNATURE ===== */
