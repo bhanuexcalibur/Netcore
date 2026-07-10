@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netcore &times; Bhanu Kumar &middot; Proof of Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:       #08090d;
+  --bg2:      #0d0f16;
+  --bg3:      #12151e;
+  --bg4:      #171b26;
+  --bg5:      #1d2230;
+  --bdr:      rgba(255,255,255,0.07);
+  --bmd:      rgba(255,255,255,0.13);
+  --blg:      rgba(255,255,255,0.22);
+  --t1:       #edeff4;
+  --t2:       #8991a3;
+  --t3:       #4a5164;
+  --signal:      #6e86ff;
+  --signal-dim:  rgba(110,134,255,0.10);
+  --signal-glow: rgba(110,134,255,0.26);
+  --signal-t:    #a3b2ff;
+  --amber:       #f2a84c;
+  --amber-dim:   rgba(242,168,76,0.11);
+  --amber-glow:  rgba(242,168,76,0.22);
+  --amber-t:     #f8c785;
+  --rose:        #ef6b7a;
+  --rose-dim:    rgba(239,107,122,0.10);
+}
+
+html{scroll-behavior:smooth;scroll-padding-top:64px;}
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:16px;line-height:1.7;font-weight:400;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(680px 460px at 10% -8%, rgba(110,134,255,0.07), transparent 60%),
+    radial-gradient(620px 420px at 98% 6%, rgba(242,168,76,0.045), transparent 60%);
+}
+
+::selection{background:var(--signal-dim);color:var(--t1);}
+a{color:inherit;}
+img,svg{display:block;}
+
+/* ===== PROGRESS BAR ===== */
+.pbar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--signal),var(--amber));z-index:500;width:0%;transition:width 0.1s linear;}
+
+/* ===== NAV ===== */
+.nav{position:sticky;top:0;z-index:300;background:rgba(8,9,13,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--bdr);padding:0 5vw;}
+.nav-i{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px;}
+.nav-brand{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--t1);letter-spacing:0.02em;white-space:nowrap;display:flex;align-items:center;gap:8px;text-decoration:none;}
+.nav-brand .dot{width:6px;height:6px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 0 var(--signal-glow);animation:dotpulse 2.6s ease-in-out infinite;}
+@keyframes dotpulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.45;transform:scale(0.72);}}
+.nav-brand b{font-weight:500;color:var(--t1);}
+.nav-brand span{color:var(--t3);}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap;}
+.np{font-size:12px;font-weight:500;padding:6px 12px;border-radius:6px;border:1px solid transparent;color:var(--t2);background:transparent;text-decoration:none;transition:all 0.13s;white-space:nowrap;font-family:'JetBrains Mono',monospace;letter-spacing:0.01em;}
+.np:hover{border-color:var(--bdr);color:var(--t1);background:var(--bg3);}
+.np.cta{background:var(--signal);border-color:var(--signal);color:#080a16;font-weight:600;margin-left:6px;}
+.np.cta:hover{opacity:0.88;}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;flex-shrink:0;}
+.hbg span{display:block;width:20px;height:1.5px;background:var(--t1);border-radius:2px;transition:transform .3s,opacity .3s;}
+.hbg.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.hbg.open span:nth-child(2){opacity:0;}
+.hbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+.mob-menu{display:none;position:fixed;inset:0;top:60px;background:var(--bg);z-index:290;flex-direction:column;padding:26px 5vw;gap:0;border-top:1px solid var(--bdr);}
+.mob-menu.open{display:flex;}
+.mob-menu a{display:block;font-size:18px;font-family:'Bricolage Grotesque',sans-serif;font-weight:600;color:var(--t1);text-decoration:none;padding:15px 0;border-bottom:1px solid var(--bdr);}
+.mob-menu a:last-child{border-bottom:none;}
+.mob-menu a.mcta{color:var(--signal-t);}
+@media(max-width:760px){.nav-links{display:none;}.hbg{display:flex;}}
+
+/* ===== WRAPPER ===== */
+.wrap{max-width:1180px;margin:0 auto;padding:0 5vw;position:relative;z-index:1;}
+section.part{padding:84px 0;border-bottom:1px solid var(--bdr);}
+.rv{opacity:0;transform:translateY(14px);transition:opacity 0.55s ease,transform 0.55s ease;}
+.rv.in{opacity:1;transform:none;}
+
+/* ===== HERO ===== */
+.hero{padding:86px 5vw 76px;max-width:1180px;margin:0 auto;position:relative;z-index:1;border-bottom:1px solid var(--bdr);}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:500;letter-spacing:0.13em;text-transform:uppercase;color:var(--t3);margin-bottom:22px;}
+.hero-hed{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(34px,6.4vw,64px);line-height:1.06;letter-spacing:-0.02em;color:var(--t1);margin-bottom:16px;max-width:760px;}
+.hero-kicker{font-family:'JetBrains Mono',monospace;font-size:clamp(13px,1.5vw,15px);color:var(--signal-t);letter-spacing:0.01em;margin-bottom:18px;max-width:640px;line-height:1.5;}
+.hero-sub{font-size:clamp(14.5px,1.5vw,16px);color:var(--t2);max-width:600px;line-height:1.7;margin-bottom:44px;font-weight:400;}
+.hero-sub strong{color:var(--t1);font-weight:600;}
+
+/* ===== PIPELINE STEPPER (hero interaction) ===== */
+.pl-caption{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);letter-spacing:0.04em;margin-bottom:16px;}
+.pipeline{background:var(--bg2);border:1px solid var(--bdr);border-radius:16px;padding:30px 26px 26px;}
+.pl-track{display:flex;align-items:flex-start;gap:0;position:relative;margin-bottom:26px;}
+.pl-node{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;cursor:pointer;background:none;border:none;padding:0;font-family:inherit;}
+.pl-line{position:absolute;top:15px;left:50%;right:-50%;height:2px;background:var(--bmd);z-index:0;transition:background 0.4s ease;}
+.pl-node:last-child .pl-line{display:none;}
+.pl-node.done .pl-line{background:var(--signal);}
+.pl-num{width:30px;height:30px;border-radius:50%;background:var(--bg4);border:1.5px solid var(--bmd);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t2);position:relative;z-index:1;transition:all 0.35s cubic-bezier(.4,0,.2,1);}
+.pl-node.done .pl-num{background:var(--signal);border-color:var(--signal);color:#080a16;font-weight:600;}
+.pl-node.active .pl-num{background:var(--bg);border-color:var(--signal);color:var(--signal-t);box-shadow:0 0 0 4px var(--signal-dim);transform:scale(1.1);}
+.pl-label{margin-top:10px;font-size:11.5px;font-weight:600;color:var(--t3);text-align:center;letter-spacing:0.01em;transition:color 0.3s ease;padding:0 4px;}
+.pl-node.active .pl-label,.pl-node.done .pl-label{color:var(--t1);}
+.pl-panel{background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:22px 22px;min-height:132px;}
+.pl-panel-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
+.pl-panel-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:17px;color:var(--t1);}
+.pl-panel-desc{font-size:14px;color:var(--t2);line-height:1.65;margin-bottom:14px;max-width:520px;}
+.pl-owners{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:4px;}
+.pl-owner{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--amber-t);background:var(--amber-dim);border:1px solid rgba(242,168,76,0.22);border-radius:6px;padding:4px 9px;}
+.pl-assets{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr);}
+.pl-asset{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--signal-t);background:var(--signal-dim);border:1px solid rgba(110,134,255,0.22);border-radius:7px;padding:6px 11px;opacity:0;transform:translateY(6px);transition:opacity 0.4s ease,transform 0.4s ease;}
+.pl-asset.in{opacity:1;transform:none;}
+
+@media(max-width:640px){
+  .pl-track{flex-wrap:nowrap;overflow-x:auto;gap:2px;}
+  .pl-label{font-size:10px;}
+  .pl-line{display:none;}
+}
+
+/* ===== SECTION HEADS ===== */
+.part-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;}
+.part-h{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(26px,3.8vw,38px);line-height:1.12;color:var(--t1);margin-bottom:12px;max-width:680px;letter-spacing:-0.015em;}
+.part-sub{font-size:15px;color:var(--t2);line-height:1.65;max-width:560px;margin-bottom:36px;}
+
+/* ===== AUDIT CARDS ===== */
+.audit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:32px;}
+.audit-card{background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:22px;}
+.audit-tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--signal-t);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:10px;}
+.audit-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:17px;color:var(--t1);margin-bottom:8px;}
+.audit-desc{font-size:13.5px;color:var(--t2);line-height:1.6;}
+.audit-note{background:var(--rose-dim);border:1px solid rgba(239,107,122,0.2);border-radius:12px;padding:20px 22px;font-size:14px;color:var(--t2);line-height:1.75;}
+.audit-note strong{color:var(--t1);font-weight:600;}
+@media(max-width:760px){.audit-grid{grid-template-columns:1fr;}}
+
+/* ===== PHASE TABS ===== */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;}
+.tab{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;padding:8px 14px;border-radius:8px;border:1px solid var(--bdr);background:var(--bg3);color:var(--t2);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.tab:hover{border-color:var(--bmd);color:var(--t1);}
+.tab.on{background:var(--signal-dim);border-color:rgba(110,134,255,0.3);color:var(--signal-t);}
+.tpanel{display:none;}
+.tpanel.on{display:block;}
+.phase-box{background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:28px 26px;}
+.phase-when{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber-t);letter-spacing:0.04em;margin-bottom:10px;}
+.phase-what{font-size:15px;color:var(--t2);line-height:1.75;margin-bottom:16px;max-width:640px;}
+.phase-owners{display:flex;gap:7px;flex-wrap:wrap;}
+.phase-owner{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--t2);background:var(--bg4);border:1px solid var(--bdr);border-radius:6px;padding:4px 9px;}
+
+/* ===== ASSET MOCKUPS ===== */
+.asset-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-bottom:26px;}
+.mock{background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;}
+.mock-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--bg4);border-bottom:1px solid var(--bdr);}
+.mock-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);}
+.mock-url{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--t3);margin-left:6px;}
+.mock-body{padding:22px;}
+.mock-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.mock-badge{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--signal-t);background:var(--signal-dim);border:1px solid rgba(110,134,255,0.22);border-radius:6px;padding:5px 9px;}
+.mock-h{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:19px;color:var(--t1);margin-bottom:8px;line-height:1.3;}
+.mock-p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:14px;}
+.mock-cta{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;background:var(--signal);color:#080a16;padding:9px 16px;border-radius:7px;}
+.op-stat{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;color:var(--t1);line-height:1;margin-bottom:6px;}
+.op-stat-label{font-size:12.5px;color:var(--t2);margin-bottom:18px;}
+.op-list{list-style:none;}
+.op-list li{font-size:13px;color:var(--t2);padding:8px 0;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;gap:10px;}
+.op-list li:first-child{border-top:none;}
+.op-list b{color:var(--t1);font-weight:600;}
+@media(max-width:760px){.asset-grid{grid-template-columns:1fr;}}
+
+.cadence{width:100%;border-collapse:collapse;font-size:13.5px;}
+.cadence th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);padding:0 0 10px;border-bottom:1px solid var(--bdr);}
+.cadence td{padding:13px 0;border-bottom:1px solid var(--bdr);color:var(--t2);vertical-align:top;}
+.cadence td:first-child{color:var(--t1);font-weight:600;white-space:nowrap;padding-right:18px;}
+.cadence tr:last-child td{border-bottom:none;}
+
+/* ===== METRICS ===== */
+.metric-row{display:flex;align-items:center;gap:16px;padding:14px 0;border-top:1px solid var(--bdr);}
+.metric-row:first-child{border-top:none;}
+.metric-label{width:230px;flex-shrink:0;font-size:13.5px;color:var(--t1);font-weight:500;}
+.metric-track{flex:1;height:8px;background:var(--bg4);border-radius:6px;overflow:hidden;}
+.metric-fill{height:100%;background:linear-gradient(90deg,var(--signal),var(--signal-t));width:0%;transition:width 1.1s cubic-bezier(.16,1,.3,1);border-radius:6px;}
+.metric-note{width:150px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);text-align:right;}
+@media(max-width:640px){.metric-row{flex-wrap:wrap;}.metric-label{width:100%;}.metric-note{width:100%;text-align:left;}}
+
+/* ===== THESIS ===== */
+.thesis{font-size:16.5px;color:var(--t2);line-height:1.85;max-width:720px;}
+.thesis strong{color:var(--t1);font-weight:600;}
+
+/* ===== OTHER WORK ===== */
+.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.wcard{display:block;background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:22px;text-decoration:none;transition:all 0.2s ease;position:relative;}
+.wcard:hover{border-color:var(--bmd);background:var(--bg4);transform:translateY(-2px);}
+.wcard.full{grid-column:span 3;}
+.wcard-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--amber-t);letter-spacing:0.03em;text-transform:uppercase;display:block;margin-bottom:12px;}
+.wcard h4{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;color:var(--t1);margin-bottom:8px;}
+.wcard p{font-size:13.5px;color:var(--t2);line-height:1.62;margin-bottom:14px;}
+.wcard-arr{font-size:14px;color:var(--t3);transition:transform 0.2s,color 0.2s;}
+.wcard:hover .wcard-arr{transform:translateX(4px);color:var(--signal-t);}
+@media(max-width:860px){.wgrid{grid-template-columns:1fr 1fr;}.wcard.full{grid-column:span 2;}}
+@media(max-width:600px){.wgrid{grid-template-columns:1fr;}.wcard.full{grid-column:span 1;}}
+
+/* ===== SIGNATURE ===== */
+.sig{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;padding:56px 0 22px;}
+.sig-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px;color:var(--t1);margin-bottom:8px;}
+.sig-name span{color:var(--t3);font-weight:400;}
+.sig-links{font-size:13.5px;color:var(--t2);line-height:1.9;}
+.sig-links a{text-decoration:none;color:var(--t2);border-bottom:1px solid var(--bdr);transition:color 0.15s,border-color 0.15s;}
+.sig-links a:hover{color:var(--signal-t);border-color:var(--signal-t);}
+.sig-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.sbtn{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;padding:11px 18px;border-radius:9px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all 0.15s;}
+.sbtn.pri{background:var(--signal);color:#080a16;}
+.sbtn.pri:hover{opacity:0.88;}
+.sbtn.ghost{border:1px solid var(--bdr);color:var(--t2);}
+.sbtn.ghost:hover{border-color:var(--bmd);color:var(--t1);}
+.note{font-size:12px;color:var(--t3);line-height:1.7;padding-bottom:48px;max-width:640px;}
+</style>
+</head>
+<body>
+
+<div class="pbar" id="pbar"></div>
+
+<nav class="nav">
+  <div class="nav-i">
+    <a href="#top" class="nav-brand"><span class="dot"></span><b>Bhanu</b><span>&nbsp;&middot;&nbsp;Netcore</span></a>
+    <div class="nav-links">
+      <a class="np" href="#audit">Audit</a>
+      <a class="np" href="#plan">Plan</a>
+      <a class="np" href="#assets">Assets</a>
+      <a class="np" href="#scorecard">Scorecard</a>
+      <a class="np" href="#work">Other work</a>
+      <a class="np cta" href="mailto:bhanukumar0902@gmail.com">Get in touch</a>
+    </div>
+    <button class="hbg" id="hbg" onclick="toggleMob()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mob-menu" id="mobm">
+  <a href="#audit" onclick="closeMob()">Audit</a>
+  <a href="#plan" onclick="closeMob()">Plan</a>
+  <a href="#assets" onclick="closeMob()">Assets</a>
+  <a href="#scorecard" onclick="closeMob()">Scorecard</a>
+  <a href="#work" onclick="closeMob()">Other work</a>
+  <a class="mcta" href="mailto:bhanukumar0902@gmail.com" onclick="closeMob()">Get in touch</a>
+</div>
+
+<div id="top"></div>
+<section class="hero">
+  <div class="hero-eyebrow rv">Proof of Work &middot; Netcore</div>
+  <h1 class="hero-hed rv">From analyst recognition to pipeline.</h1>
+  <div class="hero-kicker rv">How I&rsquo;d turn two live analyst wins into a 90-day amplification engine.</div>
+  <p class="hero-sub rv">A Gartner Leader placement and a Forrester Strong Performer placement build credibility. <strong>They don&rsquo;t build pipeline on their own.</strong> This page is the 90-day plan I&rsquo;d run to turn that recognition into revenue impact across sales, marketing, and customer engagement.</p>
+
+  <div class="pl-caption rv">Analyst recognition pipeline &middot; click a stage, or watch it run</div>
+  <div class="pipeline rv">
+    <div class="pl-track" id="plTrack"></div>
+    <div class="pl-panel" id="plPanel">
+      <div class="pl-panel-top">
+        <div class="pl-panel-title" id="plTitle"></div>
+      </div>
+      <div class="pl-panel-desc" id="plDesc"></div>
+      <div class="pl-owners" id="plOwners"></div>
+      <div class="pl-assets" id="plAssets"></div>
+    </div>
+  </div>
+</section>
+
+<section class="part" id="audit">
+  <div class="wrap">
+    <div class="part-eyebrow rv">The audit</div>
+    <h2 class="part-h rv">Recognition is fragmented.</h2>
+    <p class="part-sub rv">Netcore has multiple analyst recognitions live right now, but buyers don&rsquo;t encounter them through one consistent experience.</p>
+
+    <div class="audit-grid">
+      <div class="audit-card rv">
+        <div class="audit-tag">Gartner &middot; July 2026</div>
+        <div class="audit-title">Magic Quadrant Leader, third year running</div>
+        <div class="audit-desc">Netcore Unbxd named a Leader in the 2026 Gartner Magic Quadrant for Search and Product Discovery, following Leader placements in 2024 and 2025.</div>
+      </div>
+      <div class="audit-card rv">
+        <div class="audit-tag">Forrester &middot; Q3 2025</div>
+        <div class="audit-title">Highest score, Current Offering</div>
+        <div class="audit-desc">Netcore Unbxd received the highest score in the Current Offering category in The Forrester Wave for Commerce Search and Product Discovery Solutions.</div>
+      </div>
+      <div class="audit-card rv">
+        <div class="audit-tag">Forrester &middot; Q1 2026</div>
+        <div class="audit-title">Strong Performer, six perfect scores</div>
+        <div class="audit-desc">Netcore named a Strong Performer in The Forrester Wave for Email Marketing Service Providers, with the highest possible score in six evaluation criteria including innovation and partner ecosystem.</div>
+      </div>
+      <div class="audit-card rv">
+        <div class="audit-tag">Google Cloud &middot; 2025</div>
+        <div class="audit-title">Partner of the Year, Emerging Industry</div>
+        <div class="audit-desc">Netcore won the Google Cloud Business Applications Partner of the Year Award for Emerging Industry, its fifth industry recognition inside 18 months.</div>
+      </div>
+    </div>
+
+    <div class="audit-note rv">
+      <strong>What I noticed:</strong> Unbxd built a page called &ldquo;Leader Everywhere&rdquo; that stacks its Gartner, Forrester and G2 status in one buyer-facing hub. I couldn&rsquo;t find an equivalent hub for the Customer Engagement side, where the Forrester email win lives on its own dedicated page rather than alongside the CDP and personalization story. I&rsquo;m only going on what&rsquo;s public here, not an internal audit, but the gap in visible surface area is the thing this plan is built to close.
+    </div>
+  </div>
+</section>
+
+<section class="part" id="plan">
+  <div class="wrap">
+    <div class="part-eyebrow rv">The plan</div>
+    <h2 class="part-h rv">Launch starts before launch.</h2>
+    <p class="part-sub rv">The work begins weeks before the embargo lifts, not on announcement day.</p>
+
+    <div class="tabs rv" id="phaseTabs"></div>
+    <div id="phasePanels"></div>
+  </div>
+</section>
+
+<section class="part" id="assets">
+  <div class="wrap">
+    <div class="part-eyebrow rv">The assets</div>
+    <h2 class="part-h rv">Assets that ship.</h2>
+    <p class="part-sub rv">Not a moodboard. What actually gets built and goes live in the launch window.</p>
+
+    <div class="asset-grid">
+      <div class="mock rv">
+        <div class="mock-bar"><div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-url">netcorecloud.com/recognized</div></div>
+        <div class="mock-body">
+          <div class="mock-badges">
+            <span class="mock-badge">Gartner Leader &middot; 2026</span>
+            <span class="mock-badge">Forrester &middot; Strong Performer</span>
+            <span class="mock-badge">G2 &middot; Marketing Platforms</span>
+          </div>
+          <div class="mock-h">Every analyst that evaluated Netcore this year, in one place.</div>
+          <div class="mock-p">A single hub pulling the Gartner MQ placement, both Forrester Wave results, and the Google Cloud award into one page, with the report excerpt closest to the visitor&rsquo;s own use case surfaced first.</div>
+          <div class="mock-cta">Read the reports &rarr;</div>
+        </div>
+      </div>
+      <div class="mock rv">
+        <div class="mock-bar"><div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-dot"></div><div class="mock-url">sales &middot; one-pager.pdf</div></div>
+        <div class="mock-body">
+          <div class="op-stat">6/6</div>
+          <div class="op-stat-label">Perfect Forrester scores, email category</div>
+          <ul class="op-list">
+            <li><span>Innovation</span><b>5.00</b></li>
+            <li><span>Partner ecosystem</span><b>5.00</b></li>
+            <li><span>Pricing flexibility</span><b>5.00</b></li>
+            <li><span>In-email innovation</span><b>5.00</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <table class="cadence rv">
+      <thead><tr><th>When</th><th>Channel</th><th>What ships</th></tr></thead>
+      <tbody>
+        <tr><td>Day 0</td><td>PR + LinkedIn + hub</td><td>Press release, founder post, recognition hub goes live in sync</td></tr>
+        <tr><td>Day 1&ndash;3</td><td>Email</td><td>Install base notified, framed around what the placement means for their renewal conversation</td></tr>
+        <tr><td>Week 1</td><td>Sales</td><td>Deck slide and talk track rolled into every live enterprise cycle citing search or email</td></tr>
+        <tr><td>Week 2&ndash;4</td><td>Paid social</td><td>Boosted to accounts actively evaluating a competing CDP or ESP</td></tr>
+        <tr><td>Ongoing</td><td>Customer marketing</td><td>Reference customers lined up for a case study that pairs the analyst view with a real result</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="part" id="scorecard">
+  <div class="wrap">
+    <div class="part-eyebrow rv">The scorecard</div>
+    <h2 class="part-h rv">Measure what matters.</h2>
+    <p class="part-sub rv">The metrics product marketing actually owns on a campaign like this.</p>
+
+    <div class="rv">
+      <div class="metric-row">
+        <div class="metric-label">Hub sessions &amp; scroll depth</div>
+        <div class="metric-track"><div class="metric-fill" data-w="82"></div></div>
+        <div class="metric-note">Awareness</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label">Demo requests, UTM-attributed</div>
+        <div class="metric-track"><div class="metric-fill" data-w="58"></div></div>
+        <div class="metric-note">Pipeline</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label">Sales deck opens &amp; reuse</div>
+        <div class="metric-track"><div class="metric-fill" data-w="71"></div></div>
+        <div class="metric-note">Enablement</div>
+      </div>
+      <div class="metric-row">
+        <div class="metric-label">Win rate lift, report cited</div>
+        <div class="metric-track"><div class="metric-fill" data-w="45"></div></div>
+        <div class="metric-note">Revenue</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="part" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="part-eyebrow rv">Why this, not just a press release</div>
+    <p class="thesis rv">A buyer evaluating a CDP or an ESP doesn&rsquo;t read the press release. They see Netcore&rsquo;s own landing page during a Google search three months from now, or a line in a competitor&rsquo;s battlecard, or a slide in a live sales cycle. <strong>The recognition is only as valuable as the slowest asset it reaches.</strong> That&rsquo;s a project management problem before it&rsquo;s a messaging problem, which is why the plan above starts with owners and dates, not headlines.</p>
+  </div>
+</section>
+
+<section class="part" id="work" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="part-eyebrow rv">Other relevant work</div>
+    <h2 class="part-h rv">Five samples worth a look</h2>
+
+    <div class="wgrid">
+      <a class="wcard rv" href="https://bhanuexcalibur.github.io/Lifesight/" target="_blank" rel="noopener">
+        <span class="wcard-tag">Full PoW &middot; Marketing attribution</span>
+        <h4>Lifesight</h4>
+        <p>A martech company selling attribution and measurement into the same marketer buyer Netcore sells engagement and discovery to. Closest adjacency in the set.</p>
+        <span class="wcard-arr">&rarr;</span>
+      </a>
+      <a class="wcard rv" href="https://bhanuexcalibur.github.io/Stripe/" target="_blank" rel="noopener">
+        <span class="wcard-tag">Full PoW &middot; Developer infrastructure</span>
+        <h4>Stripe</h4>
+        <p>Pricing narrative audit split across a self-serve developer and an enterprise buyer who needs the model to hold up with a CFO in the room. Same dual-register problem Netcore has between growth teams and procurement.</p>
+        <span class="wcard-arr">&rarr;</span>
+      </a>
+      <a class="wcard rv" href="https://bhanuexcalibur.github.io/ChargeBee/" target="_blank" rel="noopener">
+        <span class="wcard-tag">Full PoW &middot; B2B SaaS, subscription</span>
+        <h4>Chargebee</h4>
+        <p>Enterprise SaaS positioning work for a subscription platform with the same multi-stakeholder buying committee Netcore sells into: marketing, IT, and finance all in the same deal.</p>
+        <span class="wcard-arr">&rarr;</span>
+      </a>
+      <a class="wcard rv" href="https://bhanuexcalibur.github.io/Canonical/" target="_blank" rel="noopener">
+        <span class="wcard-tag">Messaging audit &middot; Enterprise software</span>
+        <h4>Canonical</h4>
+        <p>A messaging audit for an enterprise infrastructure vendor with a credibility problem similar to Netcore&rsquo;s: strong analyst and technical proof points that hadn&rsquo;t been organized into a single buyer-facing argument.</p>
+        <span class="wcard-arr">&rarr;</span>
+      </a>
+      <a class="wcard full rv" href="https://bhanuexcalibur.github.io/Revolut-Used-Gone-Campaign/" target="_blank" rel="noopener">
+        <span class="wcard-tag">Campaign &middot; Creative platform</span>
+        <h4>Revolut, Already Gone</h4>
+        <p>A full creative platform built from one product insight: positioning, art direction, an in-product moment, and a reactive OOH activation. Included because this role is as much campaign execution as it is analyst relations, and this is the muscle for turning a single fact into a channel plan.</p>
+        <span class="wcard-arr">&rarr;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="sig">
+    <div>
+      <div class="sig-name">Bhanu <span>Kumar</span></div>
+      <div class="sig-links">
+        <a href="mailto:bhanukumar0902@gmail.com">bhanukumar0902@gmail.com</a><br>
+        <a href="https://linkedin.com/in/bhanuexcalibur" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+    <div class="sig-btns">
+      <a class="sbtn pri" href="mailto:bhanukumar0902@gmail.com">
+        Get in touch
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7.5 3.5l3 3-3 3" stroke="#080a16" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="sbtn ghost" href="https://drive.google.com/file/d/1pQFnYCteANDg5Ym41WEFvu2mRIBGniV7/view" target="_blank" rel="noopener">Full resume &rarr;</a>
+    </div>
+  </div>
+  <div class="note">Every analyst placement, score, and stat above is sourced from Netcore&rsquo;s and Netcore Unbxd&rsquo;s public press releases and site, and from Gartner and Forrester&rsquo;s own published announcements, as of July 2026. The observation about hub coverage is based only on what&rsquo;s publicly visible, not an internal audit. The 90-day plan, asset mockups, and scorecard are original work built for this page.</div>
+</div>
+
+<script>
+/* === NAV TOGGLE === */
+function toggleMob(){document.getElementById('hbg').classList.toggle('open');document.getElementById('mobm').classList.toggle('open');}
+function closeMob(){document.getElementById('hbg').classList.remove('open');document.getElementById('mobm').classList.remove('open');}
+
+/* === PROGRESS BAR === */
+function updateProgress(){var h=document.documentElement;var pct=(h.scrollTop)/(h.scrollHeight-h.clientHeight)*100;document.getElementById('pbar').style.width=pct+'%';}
+window.addEventListener('scroll',updateProgress,{passive:true});
+
+/* === SCROLL REVEAL === */
+var rvIo=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      if(e.target.classList.contains('metric-row')||e.target.querySelector('.metric-fill')){
+        e.target.querySelectorAll('.metric-fill').forEach(function(f){ f.style.width=f.getAttribute('data-w')+'%'; });
+      }
+    }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.rv').forEach(function(el){ rvIo.observe(el); });
+
+/* === PIPELINE STEPPER === */
+var plStages=[
+  {
+    label:'Briefing', title:'Briefing',
+    desc:'Confirm the embargo date and scope with product and comms, and identify which buyer segment this particular report matters to most.',
+    owners:['Product','Comms']
+  },
+  {
+    label:'Submission', title:'Submission',
+    desc:'Coordinate the analyst questionnaire across product, sales, and customer success so the inputs reflect what the product actually does today.',
+    owners:['Product','Sales','Customer Success']
+  },
+  {
+    label:'Evaluation', title:'Evaluation',
+    desc:'Track analyst follow-ups and reference calls while the report is being scored, and keep stakeholders updated without overpromising a result.',
+    owners:['PMM','Analyst Relations']
+  },
+  {
+    label:'Recognition', title:'Recognition',
+    desc:'The report lands under embargo. The clock on the amplification window starts here, not on public announcement day.',
+    owners:['PMM','Comms']
+  },
+  {
+    label:'Amplification', title:'Amplification',
+    desc:'Every asset that touches a live deal goes out in the same window: landing page, sales enablement, social, and email, not staggered over a month.',
+    owners:['Design','Demand Gen','Sales Enablement'],
+    assets:['Landing page','Sales one-pager','Social calendar','Email sequence','Blog + PR']
+  }
+];
+var plIndex=0,plTimer=null,plAutoDone=false;
+
+function buildPlTrack(){
+  var track=document.getElementById('plTrack');
+  track.innerHTML='';
+  plStages.forEach(function(s,i){
+    var node=document.createElement('button');
+    node.className='pl-node';
+    node.onclick=function(){ stopAuto(); goToStage(i); };
+    node.innerHTML='<div class="pl-line"></div><div class="pl-num">'+(i<9?'0':'')+(i+1)+'</div><div class="pl-label">'+s.label+'</div>';
+    track.appendChild(node);
+  });
+}
+
+function goToStage(i){
+  plIndex=i;
+  var nodes=document.querySelectorAll('.pl-node');
+  nodes.forEach(function(n,ni){
+    n.classList.remove('active','done');
+    if(ni<i) n.classList.add('done');
+    if(ni===i) n.classList.add('active');
+  });
+  var s=plStages[i];
+  document.getElementById('plTitle').textContent=s.title;
+  document.getElementById('plDesc').textContent=s.desc;
+  var ownersEl=document.getElementById('plOwners');
+  ownersEl.innerHTML='';
+  s.owners.forEach(function(o){
+    var chip=document.createElement('span');
+    chip.className='pl-owner';
+    chip.textContent=o;
+    ownersEl.appendChild(chip);
+  });
+  var assetsEl=document.getElementById('plAssets');
+  assetsEl.innerHTML='';
+  if(s.assets){
+    s.assets.forEach(function(a,ai){
+      var chip=document.createElement('span');
+      chip.className='pl-asset';
+      chip.textContent=a;
+      assetsEl.appendChild(chip);
+      setTimeout(function(){ chip.classList.add('in'); }, 80+ai*90);
+    });
+  }
+}
+
+function stopAuto(){ if(plTimer){ clearTimeout(plTimer); plTimer=null; } }
+
+function runAuto(){
+  var i=0;
+  function step(){
+    goToStage(i);
+    i++;
+    if(i<plStages.length){ plTimer=setTimeout(step,780); }
+    else { plTimer=null; plAutoDone=true; }
+  }
+  step();
+}
+
+buildPlTrack();
+setTimeout(runAuto,420);
+
+/* === PHASE TABS (project plan) === */
+var phases=[
+  {when:'Weeks -8 to -6', title:'Intake & briefing', what:'Confirm the embargo date, pull scope from product and comms, and pick the buyer segment this recognition matters to most, enterprise ecommerce for a search win, email-led B2C for the Forrester win.', owners:['PMM','Product','Comms']},
+  {when:'Weeks -6 to -3', title:'Evidence & asset draft', what:'Pull customer proof points, get quotes cleared through legal, draft the landing page and sales one-pager, and storyboard the social and email sequence before anything is final.', owners:['PMM','Design','Content','Legal']},
+  {when:'Weeks -2 to 0', title:'Embargo & rehearsal', what:'Brief the sales team with the talk track before the news is public, review embargoed assets end to end, and pitch trade press on the story ahead of launch.', owners:['PMM','Sales Enablement','PR']},
+  {when:'Launch day', title:'Synced release', what:'Press release, landing page, social, and email all go live in the same window. Sales is notified the moment the embargo lifts, not the next morning.', owners:['All teams']},
+  {when:'Weeks +1 to +12', title:'Amplification & sustain', what:'Paid social to competitive-displacement segments, the sales deck slide rolled into every live cycle, and the placement referenced in the next round of quarterly business reviews and battlecards.', owners:['PMM','Demand Gen','Sales']}
+];
+function buildPhaseTabs(){
+  var tabsEl=document.getElementById('phaseTabs');
+  var panelsEl=document.getElementById('phasePanels');
+  tabsEl.innerHTML='';
+  panelsEl.innerHTML='';
+  phases.forEach(function(p,i){
+    var tab=document.createElement('button');
+    tab.className='tab'+(i===0?' on':'');
+    tab.textContent=p.title;
+    tab.onclick=function(){ setPhase(i); };
+    tabsEl.appendChild(tab);
+
+    var panel=document.createElement('div');
+    panel.className='tpanel'+(i===0?' on':'');
+    panel.innerHTML='<div class="phase-box"><div class="phase-when">'+p.when+'</div><div class="phase-what">'+p.what+'</div><div class="phase-owners">'+p.owners.map(function(o){return '<span class="phase-owner">'+o+'</span>';}).join('')+'</div></div>';
+    panelsEl.appendChild(panel);
+  });
+}
+function setPhase(i){
+  document.querySelectorAll('#phaseTabs .tab').forEach(function(t,ti){ t.classList.toggle('on',ti===i); });
+  document.querySelectorAll('#phasePanels .tpanel').forEach(function(p,pi){ p.classList.toggle('on',pi===i); });
+}
+buildPhaseTabs();
+</script>
+
+</body>
+</html>
